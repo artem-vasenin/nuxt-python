@@ -8,15 +8,17 @@ const goToHome = () => navigateTo('/');
 </script>
 
 <template>
-<div class="error">
-  <h1>{{error.status}} ошибка</h1>
-  <p>{{error.status === 404 ? text404 : error.statusText}}</p>
-  <ActionButton
-      mode="outline"
-      @click="goToHome"
-      className="btn"
-  >Главная страница</ActionButton>
-</div>
+  <NuxtLayout>
+    <div class="error">
+      <h1>{{error.status}} ошибка</h1>
+      <p>{{error.status === 404 ? text404 : error.statusText}}</p>
+      <ActionButton
+          mode="outline"
+          @click="goToHome"
+          className="btn"
+      >Главная страница</ActionButton>
+    </div>
+  </NuxtLayout>
 </template>
 
 <style scoped>
