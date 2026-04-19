@@ -9,7 +9,20 @@ export default defineNuxtConfig({
       clientVar: '',
     },
   },
-
+  app: {
+    pageTransition: {
+      name: 'page',
+      mode: "default",
+    },
+    head: {
+      link: [
+        { rel: 'stylesheet', href: '' },
+      ],
+      script: [
+        { src: '' }
+      ],
+    },
+  },
   modules: [
     '@nuxt/eslint',
     '@nuxt/fonts',
