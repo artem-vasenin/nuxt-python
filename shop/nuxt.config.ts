@@ -5,6 +5,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiurl: '',
+      imgurl: '',
     },
   },
   app: {
