@@ -2,11 +2,9 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  // imports: { autoImport: false },
   runtimeConfig: {
-    secretToken: '',
     public: {
-      clientVar: '',
+      apiurl: '',
     },
   },
   app: {

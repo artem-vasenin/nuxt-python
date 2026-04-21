@@ -1,1 +1,6 @@
 .idea
+api-windows-amd64.exe
+api-linux-amd64
+images
+app.db
+insomnia-api.json
