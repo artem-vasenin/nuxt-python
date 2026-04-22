@@ -2,16 +2,29 @@
 import type {CategoriesResponse, ProductResponse} from "~/types/catalog.types";
 
 const conf = useRuntimeConfig();
-const select = ref('');
+const route = useRoute();
+const router = useRouter();
+const category_id = ref(route.query.category_id ?? '');
+const search = ref(route.query.search || '');
 
 const { data } = await useFetch<CategoriesResponse>(conf.public.apiurl + '/categories');
 const options = computed(() => (data.value?.categories || [])
     .map(c => ({ label: c.name, value: c.id })));
 
+const query = computed(() => ({
+      limit: route.query.limit || 20,
+      offset: route.query.offset || 0,
+      category_id: route.query.category_id || undefined,
+      search: route.query.search || undefined,
+}));
+
 const { data: prods } = await useFetch<ProductResponse>(conf.public.apiurl + '/products', {
-  query: { limit: 20, offset: 0 },
+  query,
 });
-const products = prods.value?.products;
+
+watchEffect(() => {
+  router.replace({ query: { category_id: category_id.value, search: search.value } });
+});
 </script>
 
 <template>
@@ -19,16 +32,16 @@ const products = prods.value?.products;
   <h1>Каталог товаров</h1>
   <div class="content">
     <aside class="aside">
-      <InputField />
+      <InputField v-model="search" placeholder="Search" />
       <SelectField
-        v-model="select"
-        :options="options"
+        v-model="category_id"
+        :options="[{label: 'Категории', value: ''}, ...options]"
       />
     </aside>
     <section class="products">
       <ProductCard
-        v-for="(i, k) in (products || [])"
-        :key="k"
+        v-for="(i, k) in prods?.products || []"
+        :key="i.id"
         :data="i"
       />
     </section>
