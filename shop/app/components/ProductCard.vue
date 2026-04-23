@@ -4,26 +4,11 @@ import type {Product} from "~/types/catalog.types";
 const { data } = defineProps<{ data: Product }>();
 const conf = useRuntimeConfig();
 const storeFavorite = useFavoriteStore();
-const isFavorite = computed(() => storeFavorite.favoriteIds.includes(data.id));
 
 const updateFavorite = (event: MouseEvent) => {
   event.stopPropagation();
-
-  if (isFavorite.value) {
-    storeFavorite.delFavorite(data.id);
-  } else {
-    storeFavorite.addToFavorite(data.id);
-  }
+  storeFavorite.toggleFavorite(data.id);
 };
-
-// const handleWrapClick = (event: MouseEvent) => {
-//   const target = event.target as HTMLElement;
-//   const isButton = target.closest('button');
-//
-//   if (!isButton) {
-//     navigateTo('/catalog/' + data.id);
-//   }
-// };
 </script>
 
 <template>
@@ -31,7 +16,7 @@ const updateFavorite = (event: MouseEvent) => {
     <div class="top">
       <button
           @click.stop="updateFavorite"
-          :class="['favorite', {isFavorite}]"
+          :class="['favorite', {isFavorite: storeFavorite.isFavorite(data.id)}]"
       ><IconHeartFilled/></button>
       <span class="discount" v-if="data.discount">-{{data.discount}}%</span>
     </div>

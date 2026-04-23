@@ -13,10 +13,17 @@ export const useFavoriteStore = defineStore('favorite', () => {
         }
     }
     
-    async function tmpFetchData() {
-        const data = await $fetch('http://localhost:3000/api/categories');
-        console.log(data);
+    function isFavorite(id: number) {
+        return favoriteIds.value.includes(id);
     }
 
-    return { favoriteIds, addToFavorite, delFavorite, tmpFetchData };
+    function toggleFavorite(id: number) {
+        if (isFavorite(id)) {
+            delFavorite(id);
+        } else {
+            addToFavorite(id);
+        }
+    }
+
+    return { favoriteIds, addToFavorite, delFavorite, isFavorite, toggleFavorite };
 });
