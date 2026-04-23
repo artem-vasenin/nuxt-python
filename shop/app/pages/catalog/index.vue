@@ -2,13 +2,12 @@
 import type {CategoriesResponse, ProductResponse} from "~/types/catalog.types";
 import {useDebounceFn} from "@vueuse/core";
 
-const conf = useRuntimeConfig();
 const route = useRoute();
 const router = useRouter();
 const category_id = ref(route.query.category_id ?? '');
 const search = ref(route.query.search || '');
 
-const { data } = await useFetch<CategoriesResponse>(conf.public.apiurl + '/categories');
+const { data } = await useFetch<CategoriesResponse>(useApi() + '/categories');
 const options = computed(() => (data.value?.categories || [])
     .map(c => ({ label: c.name, value: c.id })));
 
@@ -19,7 +18,7 @@ const query = computed(() => ({
       search: route.query.search || undefined,
 }));
 
-const { data: prods } = await useFetch<ProductResponse>(conf.public.apiurl + '/products', {
+const { data: prods } = await useFetch<ProductResponse>(useApi() + '/products', {
   query,
 });
 
