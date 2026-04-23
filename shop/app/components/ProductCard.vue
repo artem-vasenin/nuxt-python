@@ -1,24 +1,46 @@
 <script setup lang="ts">
 import type {Product} from "~/types/catalog.types";
 
-const props = defineProps<{ data: Product }>();
+const { data } = defineProps<{ data: Product }>();
 const conf = useRuntimeConfig();
+const storeFavorite = useFavoriteStore();
+const isFavorite = computed(() => storeFavorite.favoriteIds.includes(data.id));
+
+const updateFavorite = (event: MouseEvent) => {
+  event.stopPropagation();
+
+  if (isFavorite.value) {
+    storeFavorite.delFavorite(data.id);
+  } else {
+    storeFavorite.addToFavorite(data.id);
+  }
+};
+
+// const handleWrapClick = (event: MouseEvent) => {
+//   const target = event.target as HTMLElement;
+//   const isButton = target.closest('button');
+//
+//   if (!isButton) {
+//     navigateTo('/catalog/' + data.id);
+//   }
+// };
 </script>
 
 <template>
-  <div class="wrap" @click="navigateTo('/catalog/' + props.data.id)">
+  <div class="wrap" @click="navigateTo('/catalog/' + data.id)">
     <div class="top">
-      <span class="favorite">
-        <IconHeartFilled/>
-      </span>
-      <span v-if="props.data.discount" class="discount">-{{props.data.discount}}%</span>
+      <button
+          @click.stop="updateFavorite"
+          :class="['favorite', {isFavorite}]"
+      ><IconHeartFilled/></button>
+      <span class="discount" v-if="data.discount">-{{data.discount}}%</span>
     </div>
     <div class="center">
-      <img v-if="props.data.images" :src="`${conf.public.imgurl}${props.data.images[0]}`" alt="img" class="img">
+      <img v-if="data.images" :src="`${conf.public.imgurl}${data.images[0]}`" alt="img" class="img">
     </div>
     <div class="bottom">
-      <div class="name">{{props.data.name}}</div>
-      <div class="price">$ {{props.data.price}},00</div>
+      <div class="name">{{data.name}}</div>
+      <div class="price">$ {{data.price}},00</div>
     </div>
   </div>
 </template>
@@ -32,6 +54,12 @@ const conf = useRuntimeConfig();
     .img {
       box-shadow: 0 0 18px rgb(0 0 0 / .3);
       transition: box-shadow .3s;
+    }
+
+    .favorite {
+      opacity: 1;
+      pointer-events: initial;
+      transition: opacity .3s;
     }
   }
 }
@@ -60,6 +88,20 @@ const conf = useRuntimeConfig();
 }
 .favorite {
   font-size: 20px;
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s;
+
+  &.isFavorite {
+    opacity: 1;
+    pointer-events: initial;
+    transition: opacity .3s;
+  }
 }
 .img {
   max-width: 300px;
