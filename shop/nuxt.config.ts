@@ -25,6 +25,15 @@ export default defineNuxtConfig({
       ],
     },
   },
+  sitemap: {
+    // не заработало
+    // sources: ['/server/api/sitemap/urls'],
+    defaults: {
+      lastmod: new Date().toDateString(),
+      priority: 0.5,
+      changefreq: 'weekly',
+    },
+  },
   modules: [
     '@nuxt/eslint',
     '@nuxt/fonts',
@@ -32,5 +41,6 @@ export default defineNuxtConfig({
     '@nuxt/scripts',
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
+    '@nuxtjs/sitemap'
   ]
 })
