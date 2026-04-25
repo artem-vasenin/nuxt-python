@@ -27,12 +27,15 @@ export default defineNuxtConfig({
   },
   sitemap: {
     // не заработало
-    // sources: ['/server/api/sitemap/urls'],
+    // sources: ['/api/sitemap/urls'],
     defaults: {
       lastmod: new Date().toDateString(),
       priority: 0.5,
       changefreq: 'weekly',
     },
+  },
+  robots: {
+    disallow: ['/account'],
   },
   modules: [
     '@nuxt/eslint',
@@ -41,6 +44,7 @@ export default defineNuxtConfig({
     '@nuxt/scripts',
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
-    '@nuxtjs/sitemap'
+    '@nuxtjs/sitemap',
+    '@nuxtjs/robots'
   ]
 })
