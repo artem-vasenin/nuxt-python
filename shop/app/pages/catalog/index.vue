@@ -7,6 +7,8 @@ const router = useRouter();
 const category_id = ref(route.query.category_id ?? '');
 const search = ref(route.query.search || '');
 
+
+
 const { data } = await useFetch<CategoriesResponse>(useApi() + '/categories');
 const options = computed(() => (data.value?.categories || [])
     .map(c => ({ label: c.name, value: c.id })));

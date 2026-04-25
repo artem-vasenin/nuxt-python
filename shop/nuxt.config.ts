@@ -14,6 +14,9 @@ export default defineNuxtConfig({
       mode: "default",
     },
     head: {
+      htmlAttrs: { lang: 'ru'},
+      title: 'MegaShop',
+      titleTemplate: '%s | Shop',
       link: [
         { rel: 'stylesheet', href: '' },
       ],
