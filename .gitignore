@@ -1,2 +1,11 @@
 .idea
 .env
+
+__pycache__/
+build/
+dist/
+wheels/
+*.egg-info
+*.py[os]
+
+.venv
