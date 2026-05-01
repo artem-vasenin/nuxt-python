@@ -407,6 +407,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "fastapi", extra = ["standard"] },
+    { name = "pydantic" },
 ]
 
 [package.dev-dependencies]
@@ -415,7 +416,10 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "fastapi", extras = ["standard"], specifier = ">=0.136.1" }]
+requires-dist = [
+    { name = "fastapi", extras = ["standard"], specifier = ">=0.136.1" },
+    { name = "pydantic", specifier = ">=2.13.3" },
+]
 
 [package.metadata.requires-dev]
 dev = [{ name = "ruff", specifier = ">=0.15.12" }]
