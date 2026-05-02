@@ -6,6 +6,7 @@ from .schema import (
     ProjectUpdateReq,
     ProductFullResp,
 )
+from .services import ProjServiceDeps
 
 
 router = APIRouter(prefix="/project", tags=['Projects'])
@@ -22,8 +23,8 @@ router = APIRouter(prefix="/project", tags=['Projects'])
     Projects is parents for Tasks
     '''
 )
-def add_project(data: ProjectCreateReq):
-    return ProjectCreateResp(id=1, name=data.name)
+def add_project(data: ProjectCreateReq, service: ProjServiceDeps):
+    return ProjectCreateResp(id=service.get_project(17), name=data.name)
 
 
 @router.get(
