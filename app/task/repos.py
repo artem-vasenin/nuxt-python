@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging
 from typing import Annotated
 
 from fastapi import Depends, HTTPException
@@ -32,6 +33,8 @@ tasks = [
     ),
 ]
 
+logger = logging.getLogger(__name__)
+
 class TaskRepo():
     def get_list(self) -> list[Task]:
         return tasks
@@ -39,7 +42,8 @@ class TaskRepo():
     def get_item(self, pid: int) -> Task:
         res = list(filter(lambda x: x.pid == pid, tasks))
         if not len(res):
-            raise HTTPException(404, "Item is not found")
+            logger.error(f"Item (ID:{pid}) is not found", exc_info=True)
+            raise HTTPException(404, f"Item (ID:{pid}) is not found")
         return res[0]
 
     def set_item(self, data: TaskCreateReq) -> Task:

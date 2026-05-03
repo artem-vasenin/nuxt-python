@@ -1,0 +1,15 @@
+version: 1
+disable_existing_loggers: false
+formatters:
+    default:
+        format: '%(asctime)s [%(levelname)s] %(name)s - %(message)s - UID: %(user_id)s'
+        defaults:
+            user_id: ---
+handlers:
+    console:
+        class: logging.StreamHandler
+        stream: ext://sys.stdout
+        formatter: default
+root:
+     level: INFO
+     handlers: [console]
