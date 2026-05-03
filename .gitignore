@@ -10,3 +10,4 @@ wheels/
 *.py[os]
 
 .venv
+postgres-data/

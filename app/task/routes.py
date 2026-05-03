@@ -3,13 +3,16 @@ import logging
 
 from .schemas import Task, TaskCreateReq, TaskUpdateReq
 from .services import TaskServiceDeps
+from app.core.db import check
 
 
 router = APIRouter(prefix='/task', tags=['Tasks'])
 logger = logging.getLogger(__name__)
 
 @router.get('/', status_code=200, response_model=list[Task])
-def get_list(serv: TaskServiceDeps, req: Request):
+async def get_list(serv: TaskServiceDeps, req: Request):
+    res = await check()
+    print(res)
     logger.info('JWT %s', req.app.state.settings.auth.jwt, extra={'user_id': 34567})
     return serv.get_list()
 
