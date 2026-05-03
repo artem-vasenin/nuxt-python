@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 
 from .schemas import Task, TaskCreateReq, TaskUpdateReq
 from .services import TaskServiceDeps
@@ -7,7 +7,8 @@ from .services import TaskServiceDeps
 router = APIRouter(prefix='/task', tags=['Tasks'])
 
 @router.get('/', status_code=200, response_model=list[Task])
-def get_list(serv: TaskServiceDeps):
+def get_list(serv: TaskServiceDeps, req: Request):
+    print(req.app.state.settings.auth.jwt)
     return serv.get_list()
 
 @router.get('/{pid}', status_code=200, response_model=Task)
