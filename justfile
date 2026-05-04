@@ -9,3 +9,12 @@
 
 @format:
     uv run ruff format
+
+@makemigrations name:
+    uv run alembic revision --autogenerate -m "{{name}}"
+
+@migrate:
+    uv run alembic upgrade head
+
+@migrate_down steps:
+    uv run alembic downgrade -{{steps}}

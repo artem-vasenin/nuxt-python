@@ -1,18 +1,15 @@
-from fastapi import APIRouter, Request
 import logging
+from fastapi import APIRouter, Request
 
-from .schemas import Task, TaskCreateReq, TaskUpdateReq
 from .services import TaskServiceDeps
-from app.core.db import check
+from .schemas import Task, TaskCreateReq, TaskUpdateReq
 
 
 router = APIRouter(prefix='/task', tags=['Tasks'])
 logger = logging.getLogger(__name__)
 
 @router.get('/', status_code=200, response_model=list[Task])
-async def get_list(serv: TaskServiceDeps, req: Request):
-    res = await check()
-    print(res)
+def get_list(serv: TaskServiceDeps, req: Request):
     logger.info('JWT %s', req.app.state.settings.auth.jwt, extra={'user_id': 34567})
     return serv.get_list()
 

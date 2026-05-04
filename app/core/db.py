@@ -1,6 +1,9 @@
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Annotated
+from fastapi import Depends
+
 from app.core.settings import Settings
-from sqlalchemy import text
+from sqlalchemy import select
+from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
     AsyncSession,
@@ -20,7 +23,14 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
     async with session() as s:
         yield s
 
-async def check():
-    async with engine.connect() as c:
-        res = await c.execute(text('select 1'))
-        return res.scalar_one()
+async def check(session: AsyncSession):
+    res = await session.execute(select(1))
+    return res.scalar_one()
+
+DbSessionDeps = Annotated[
+    AsyncSession,
+    Depends(get_session),
+]
+
+class Base(DeclarativeBase):
+    ...

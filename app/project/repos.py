@@ -1,46 +1,44 @@
+import logging
 from typing import Annotated
 from fastapi import Depends
+from sqlalchemy import select
 
-from .schemas import ProductFullResp, ProjectCreateReq
-
-
-lst: list[ProductFullResp] = [
-    ProductFullResp(id=1, key='P1', name='First proj', description='This is the first project'),
-    ProductFullResp(id=2, key='P2', name='Second proj', description='This is the second project'),
-    ProductFullResp(id=3, key='P3', name='Third proj', description='This is the third project'),
-    ProductFullResp(id=5, key='P5', name='Fifth proj', description='This is the fifth project'),
-]
+from app.core.db import DbSessionDeps, AsyncSession
+from .schemas import ProductFullResp, ProjectUpdateReq
+from .models import ProjectModel
 
 
-class ProjectRepo():
-    def get_list(self) -> list[ProductFullResp]:
-        return lst
+logger = logging.getLogger(__name__)
 
-    def get_by_id(self, pid: int) -> ProductFullResp | None:
-        result = list(filter(lambda x: x.id == pid, lst))
-        return result[0] if len(result) else None
+class ProjectRepo:
+    def __init__(self, session: AsyncSession):
+        self.session = session
 
-    def set_item(self, data: ProjectCreateReq) -> ProductFullResp:
-        max_id = 0
-        for i in lst:
-            if i.id > max_id:
-                max_id = i.id
-        candidate = ProductFullResp(id=(max_id + 1), name=data.name, key=f'P{max_id + 1}', description=data.description)
-        lst.append(candidate)
-        return candidate
+    async def get_list(self) -> list[ProjectModel]:
+        result = await self.session.execute(select(ProjectModel))
+        return result.scalars().all()
+
+    async def get_by_id(self, pid: int) -> type[ProjectModel] | None:
+        return await self.session.get(ProjectModel, pid)
+
+    async def set_item(self, item: ProjectModel) -> ProjectModel:
+        self.session.add(item)
+        await self.session.commit()
+        await self.session.refresh(item)
+        logger.info(f'Project {item.key} created')
+
+        return item
+
+    async def update_item(self, pid: int, data: ProjectUpdateReq) -> ProductFullResp | None:
+        return None
 
     def del_item(self, pid: int) -> bool:
         flag = False
-        for i, item in enumerate(lst):
-            if item.id == pid:
-                del lst[i]
-                flag = True
-                break
         return flag
 
 
-def get_project_repo():
-    return ProjectRepo()
+def get_project_repo(session: DbSessionDeps):
+    return ProjectRepo(session)
 
 ProjectRepoDeps = Annotated[
     ProjectRepo,

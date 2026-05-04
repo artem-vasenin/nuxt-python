@@ -33,5 +33,5 @@ class ProjectUpdateReq(BaseModel):
 class ProductFullResp(BaseModel):
     id: int
     key: str
-    name: str | None
+    name: str
     description: str | None

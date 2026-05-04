@@ -1,26 +1,34 @@
 from typing import Annotated
 from fastapi import Depends
 
-from .schemas import ProjectCreateReq, ProductFullResp
-
+from .models import ProjectModel
 from .repos import ProjectRepo, ProjectRepoDeps
+from .schemas import ProjectCreateReq, ProductFullResp, ProjectUpdateReq
 
 
 class ProjectService():
     def __init__(self, repo: ProjectRepo):
         self.repo = repo
 
-    def get_projects(self) -> list[ProductFullResp]:
-        return self.repo.get_list()
+    async def get_projects(self) -> list[ProductFullResp]:
+        return await self.repo.get_list()
 
-    def get_project(self, pid: int):
-        return self.repo.get_by_id(pid)
+    async def get_project(self, pid: int)->ProductFullResp | None:
+        res = await self.repo.get_by_id(pid)
+        if not res:
+            return None
+        return ProductFullResp(id=res.id, key=res.key, name=res.name, description=res.description)
 
-    def set_project(self, data: ProjectCreateReq):
-        return self.repo.set_item(data)
+    async def set_project(self, data: ProjectCreateReq)->ProductFullResp:
+        item = ProjectModel(**data.model_dump())
+        result = await self.repo.set_item(item)
+        return ProductFullResp(id=result.id, key=result.key, name=result.name, description=result.description)
 
-    def del_project(self, pid: int):
-        return self.repo.del_item(pid)
+    async def update_project(self, pid: int, data: ProjectUpdateReq)->ProductFullResp:
+        return await self.repo.update_item(pid, data)
+
+    async def del_project(self, pid: int)->bool:
+        return await self.repo.del_item(pid)
 
 def get_pr_serv(repo: ProjectRepoDeps):
     return ProjectService(repo)
