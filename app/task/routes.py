@@ -6,8 +6,8 @@ from .schemas import TaskFull, TaskCreateReq, TaskUpdateReq
 
 router = APIRouter(prefix='/task', tags=['Tasks'])
 
-@router.get('/', status_code=200, response_model=list[TaskFull])
-async def get_list(serv: TaskServiceDeps)->list[TaskFull]:
+@router.get('/', status_code=200)
+async def get_list(serv: TaskServiceDeps):
     return await serv.get_list()
 
 @router.get('/{pid}', status_code=200, response_model=TaskFull)

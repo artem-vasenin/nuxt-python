@@ -4,6 +4,7 @@ from sqlalchemy import select
 from fastapi import Depends, HTTPException
 
 from .models import TaskModel
+from app.project.models import ProjectModel
 from .schemas import TaskCreateReq, TaskUpdateReq
 from app.core.db import DbSessionDeps, AsyncSession
 
@@ -18,10 +19,15 @@ class TaskRepo():
         items = await self.session.execute(select(TaskModel))
         return items.scalars().all()
 
-    async def get_item(self, pid: int) -> type[TaskModel] | None:
+    async def get_item(self, pid: int) -> TaskModel | None:
         return await self.session.get(TaskModel, pid)
 
     async def set_item(self, data: TaskCreateReq) -> TaskModel:
+        if not data.project_id:
+            raise HTTPException(status_code=400, detail="Project id is required")
+        project = await self.session.get(ProjectModel, data.project_id)
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
         item = TaskModel(**data.model_dump())
         self.session.add(item)
         await self.session.commit()
@@ -32,8 +38,11 @@ class TaskRepo():
         item = await self.get_item(pid)
         if not item:
             raise HTTPException(status_code=404, detail="Item not found")
+        if data.project_id:
+            project = await self.session.get(ProjectModel, data.project_id)
+            if not project:
+                raise HTTPException(status_code=404, detail="Project not found")
         patch = data.model_dump(exclude_unset=True)
-        print(patch)
         for f, v in patch.items():
             setattr(item, f, v)
         await self.session.commit()

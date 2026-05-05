@@ -6,7 +6,16 @@ from .schemas import TaskCreateReq, TaskFull, TaskUpdateReq
 from .repos import TaskRepo, TaskRepoDeps
 
 
-class TaskService():
+def transform_task(item: TaskModel)->TaskFull:
+    return TaskFull(
+        id=item.id,
+        name=item.name,
+        description=item.description,
+        is_completed=item.is_completed,
+        project_id=item.project_id,
+    )
+
+class TaskService:
     def __init__(self, repo: TaskRepo):
         self.repo = repo
 
@@ -17,15 +26,15 @@ class TaskService():
         result = await self.repo.get_item(pid)
         if result is None:
             raise HTTPException(status_code=404, detail="Item not found")
-        return TaskFull(id=result.id, name=result.name, description=result.description, is_completed=result.is_completed)
+        return transform_task(result)
 
     async def set_item(self, data: TaskCreateReq) -> TaskFull:
         result = await self.repo.set_item(data)
-        return TaskFull(id=result.id, name=result.name, description=result.description, is_completed=result.is_completed)
+        return transform_task(result)
 
     async def upd_item(self, pid: int, data: TaskUpdateReq) -> TaskFull:
         result = await self.repo.upd_item(pid, data)
-        return TaskFull(id=result.id, name=result.name, description=result.description, is_completed=result.is_completed)
+        return transform_task(result)
 
     async def del_item(self, pid: int) -> bool:
         return await self.repo.del_item(pid)
