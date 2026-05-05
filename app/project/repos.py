@@ -1,6 +1,6 @@
 import logging
 from typing import Annotated
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from sqlalchemy import select
 
 from app.core.db import DbSessionDeps, AsyncSession
@@ -29,12 +29,25 @@ class ProjectRepo:
 
         return item
 
-    async def update_item(self, pid: int, data: ProjectUpdateReq) -> ProductFullResp | None:
-        return None
+    async def update_item(self, pid: int, data: ProjectUpdateReq) -> ProjectModel:
+        item = await self.get_by_id(pid)
+        if not item:
+            raise HTTPException(status_code=404, detail='Project not found')
+        patch = data.model_dump(exclude_unset=True)
+        for f, v in patch.items():
+            setattr(item, f, v)
+        await self.session.commit()
+        await self.session.refresh(item)
 
-    def del_item(self, pid: int) -> bool:
-        flag = False
-        return flag
+        return item
+
+    async def del_item(self, pid: int) -> bool:
+        item = await self.get_by_id(pid)
+        if not item:
+            return False
+        await self.session.delete(item)
+        await self.session.commit()
+        return True
 
 
 def get_project_repo(session: DbSessionDeps):

@@ -25,7 +25,8 @@ class ProjectService():
         return ProductFullResp(id=result.id, key=result.key, name=result.name, description=result.description)
 
     async def update_project(self, pid: int, data: ProjectUpdateReq)->ProductFullResp:
-        return await self.repo.update_item(pid, data)
+        result = await self.repo.update_item(pid, data)
+        return ProductFullResp(id=result.id, key=result.key, name=result.name, description=result.description)
 
     async def del_project(self, pid: int)->bool:
         return await self.repo.del_item(pid)
