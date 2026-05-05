@@ -1,31 +1,27 @@
-import logging
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
 
 from .services import TaskServiceDeps
-from .schemas import Task, TaskCreateReq, TaskUpdateReq
+from .schemas import TaskFull, TaskCreateReq, TaskUpdateReq
 
 
 router = APIRouter(prefix='/task', tags=['Tasks'])
-logger = logging.getLogger(__name__)
 
-@router.get('/', status_code=200, response_model=list[Task])
-def get_list(serv: TaskServiceDeps, req: Request):
-    logger.info('JWT %s', req.app.state.settings.auth.jwt, extra={'user_id': 34567})
-    return serv.get_list()
+@router.get('/', status_code=200, response_model=list[TaskFull])
+async def get_list(serv: TaskServiceDeps)->list[TaskFull]:
+    return await serv.get_list()
 
-@router.get('/{pid}', status_code=200, response_model=Task)
-def get_item(pid: int, serv: TaskServiceDeps):
-    logger.warning(f'ID: {pid}', extra={'user_id': 34567})
-    return serv.get_item(pid)
+@router.get('/{pid}', status_code=200, response_model=TaskFull)
+async def get_item(pid: int, serv: TaskServiceDeps)->TaskFull:
+    return await serv.get_item(pid)
 
-@router.post('/', status_code=201, response_model=Task)
-def set_item(data: TaskCreateReq, serv: TaskServiceDeps):
-    return serv.set_item(data)
+@router.post('/', status_code=201, response_model=TaskFull)
+async def set_item(data: TaskCreateReq, serv: TaskServiceDeps)->TaskFull:
+    return await serv.set_item(data)
 
-@router.patch('/{pid}')
-def update_item(pid: int, data: TaskUpdateReq, serv: TaskServiceDeps):
-    return serv.upd_item(pid, data)
+@router.patch('/{pid}', status_code=201, response_model=TaskFull)
+async def update_item(pid: int, data: TaskUpdateReq, serv: TaskServiceDeps)->TaskFull:
+    return await serv.upd_item(pid, data)
 
-@router.delete('/{pid}')
-def delete_item(pid: int, serv: TaskServiceDeps):
-    return serv.del_item(pid)
+@router.delete('/{pid}', status_code=201, response_model=bool)
+async def delete_item(pid: int, serv: TaskServiceDeps)->bool:
+    return await serv.del_item(pid)

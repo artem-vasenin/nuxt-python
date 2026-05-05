@@ -10,6 +10,9 @@
 @format:
     uv run ruff format
 
+@db:
+    uv run psql -h localhost -p 5433 -U postgres -d board
+
 @makemigrations name:
     uv run alembic revision --autogenerate -m "{{name}}"
 

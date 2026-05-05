@@ -4,7 +4,7 @@ from fastapi import Depends, HTTPException
 from sqlalchemy import select
 
 from app.core.db import DbSessionDeps, AsyncSession
-from .schemas import ProductFullResp, ProjectUpdateReq
+from .schemas import  ProjectUpdateReq
 from .models import ProjectModel
 
 

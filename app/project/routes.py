@@ -51,6 +51,7 @@ async def update_project(service: ProjServiceDeps, data: ProjectUpdateReq, path:
 
 @router.delete(
     "/{pid}",
+    status_code=201,
     response_model=bool,
     summary='Get Project by id'
 )

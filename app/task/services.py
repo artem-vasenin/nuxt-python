@@ -1,7 +1,8 @@
 from typing import Annotated
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 
-from .schemas import TaskCreateReq, Task, TaskUpdateReq
+from .models import TaskModel
+from .schemas import TaskCreateReq, TaskFull, TaskUpdateReq
 from .repos import TaskRepo, TaskRepoDeps
 
 
@@ -9,20 +10,25 @@ class TaskService():
     def __init__(self, repo: TaskRepo):
         self.repo = repo
 
-    def get_list(self) -> list[Task]:
-        return self.repo.get_list()
+    async def get_list(self) -> list[TaskModel]:
+        return await self.repo.get_list()
 
-    def get_item(self, pid: int) -> Task:
-        return self.repo.get_item(pid)
+    async def get_item(self, pid: int) -> TaskFull:
+        result = await self.repo.get_item(pid)
+        if result is None:
+            raise HTTPException(status_code=404, detail="Item not found")
+        return TaskFull(id=result.id, name=result.name, description=result.description, is_completed=result.is_completed)
 
-    def set_item(self, data: TaskCreateReq) -> Task:
-        return self.repo.set_item(data)
+    async def set_item(self, data: TaskCreateReq) -> TaskFull:
+        result = await self.repo.set_item(data)
+        return TaskFull(id=result.id, name=result.name, description=result.description, is_completed=result.is_completed)
 
-    def upd_item(self, pid: int, data: TaskUpdateReq) -> Task:
-        return self.repo.upd_item(pid, data)
+    async def upd_item(self, pid: int, data: TaskUpdateReq) -> TaskFull:
+        result = await self.repo.upd_item(pid, data)
+        return TaskFull(id=result.id, name=result.name, description=result.description, is_completed=result.is_completed)
 
-    def del_item(self, pid: int) -> bool:
-        return self.repo.del_item(pid)
+    async def del_item(self, pid: int) -> bool:
+        return await self.repo.del_item(pid)
 
 
 def get_task_service(repo: TaskRepoDeps):
