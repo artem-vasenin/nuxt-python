@@ -1,14 +1,13 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from .services import TaskServiceDeps
-from .schemas import TaskFull, TaskCreateReq, TaskUpdateReq
-
+from .schemas import TaskFull, TaskCreateReq, TaskUpdateReq, TaskListParams, TaskListResp
 
 router = APIRouter(prefix='/task', tags=['Tasks'])
 
-@router.get('/', status_code=200)
-async def get_list(serv: TaskServiceDeps):
-    return await serv.get_list()
+@router.get('/', status_code=200, response_model=TaskListResp)
+async def get_list(serv: TaskServiceDeps, params: TaskListParams = Depends())->TaskListResp:
+    return await serv.get_list(params)
 
 @router.get('/{pid}', status_code=200, response_model=TaskFull)
 async def get_item(pid: int, serv: TaskServiceDeps)->TaskFull:

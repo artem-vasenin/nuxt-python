@@ -1,6 +1,6 @@
 import logging
 from typing import Annotated
-from sqlalchemy import select
+from sqlalchemy import select, func, or_
 from fastapi import Depends, HTTPException
 
 from .models import TaskModel
@@ -11,13 +11,26 @@ from app.core.db import DbSessionDeps, AsyncSession
 
 logger = logging.getLogger(__name__)
 
-class TaskRepo():
+class TaskRepo:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_list(self) -> list[TaskModel]:
-        items = await self.session.execute(select(TaskModel))
-        return items.scalars().all()
+    async def get_list(self, offset: int = 0, limit: int = 10, q: str = None) -> tuple[list[TaskModel], int]:
+        cnt_query = select(func.count()).select_from(TaskModel)
+        list_query = select(TaskModel)
+
+        if q and q.strip():
+            cnt_query = cnt_query.where(
+                or_(TaskModel.name.ilike(f"%{q}%"), TaskModel.description.ilike(f"%{q}%"))
+            )
+            list_query = list_query.where(
+                or_(TaskModel.name.ilike(f"%{q}%"), TaskModel.description.ilike(f"%{q}%"))
+            )
+
+        total = (await self.session.execute(cnt_query)).scalar_one()
+        list_query.order_by(TaskModel.id).offset(offset).limit(limit)
+        items = list((await self.session.execute(list_query)).scalars().all())
+        return items, total
 
     async def get_item(self, pid: int) -> TaskModel | None:
         return await self.session.get(TaskModel, pid)

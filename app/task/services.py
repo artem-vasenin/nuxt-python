@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import Depends, HTTPException
 
 from .models import TaskModel
-from .schemas import TaskCreateReq, TaskFull, TaskUpdateReq
+from .schemas import TaskCreateReq, TaskFull, TaskUpdateReq, TaskListParams, TaskListResp
 from .repos import TaskRepo, TaskRepoDeps
 
 
@@ -19,8 +19,20 @@ class TaskService:
     def __init__(self, repo: TaskRepo):
         self.repo = repo
 
-    async def get_list(self) -> list[TaskModel]:
-        return await self.repo.get_list()
+    async def get_list(self, params: TaskListParams) -> TaskListResp:
+        lst, total = await self.repo.get_list(offset=params.offset, limit=params.limit, q=params.q)
+        return TaskListResp(
+            items=[TaskFull(
+                id=i.id,
+                name=i.name,
+                description=i.description,
+                is_completed=i.is_completed,
+                project_id=i.project_id,
+            ) for i in lst],
+            total=total,
+            offset=params.offset,
+            limit=params.limit,
+        )
 
     async def get_item(self, pid: int) -> TaskFull:
         result = await self.repo.get_item(pid)
