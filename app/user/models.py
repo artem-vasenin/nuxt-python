@@ -11,10 +11,10 @@ class UserModel(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     email: Mapped[str] = mapped_column(String(128), nullable=False, unique=True)
-    password: Mapped[str] = mapped_column(String(128), nullable=False)
+    password: Mapped[str] = mapped_column(String(1024), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
-    def __init__(self, email: str, password: str, is_active: bool, **kwargs: Any):
+    def __init__(self, email: str, password: str, is_active: bool = True, **kwargs: Any):
         super().__init__(**kwargs)
         self.email = email
         self.password = password

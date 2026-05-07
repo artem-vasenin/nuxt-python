@@ -8,7 +8,8 @@ class BDSettings(BaseModel):
     url: str
 
 class AuthSettings(BaseModel):
-    jwt: str
+    secret: str
+    time: int
 
 class AppSettings(BaseModel):
     title: str = 'Jira'
@@ -20,7 +21,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8', extra='ignore')
     db_url: str = Field(validation_alias='DATABASE_URL')
     db_url_sync: str = Field(validation_alias='DATABASE_URL_SYNC')
-    jwt_token: str
+    jwt_secret: str
+    jwt_time: int
 
     @property
     def db(self)->BDSettings:
@@ -32,7 +34,7 @@ class Settings(BaseSettings):
 
     @property
     def auth(self)->AuthSettings:
-        return AuthSettings(jwt=self.jwt_token)
+        return AuthSettings(secret=self.jwt_secret, time=self.jwt_time)
 
 def get_settings(req: Request)->Settings:
     return req.app.state.settings

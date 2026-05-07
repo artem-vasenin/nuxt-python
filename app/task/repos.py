@@ -70,10 +70,10 @@ class TaskRepo:
         await self.session.commit()
         return True
 
-def get_task_repo(session: DbSessionDeps):
+def get_repo(session: DbSessionDeps):
     return TaskRepo(session)
 
 TaskRepoDeps = Annotated[
     TaskRepo,
-    Depends(get_task_repo)
+    Depends(get_repo)
 ]
