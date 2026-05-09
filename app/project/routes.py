@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends
+
+from app.user.me import MeDeps
 from .schemas import (
     ProjectCreateReq,
     ProjectPath,
@@ -21,8 +23,8 @@ router = APIRouter(prefix="/project", tags=['Projects'])
     Projects is parents for Tasks
     '''
 )
-async def add_project(data: ProjectCreateReq, service: ProjServiceDeps)->ProductFullResp:
-    return await service.set_project(data)
+async def add_project(data: ProjectCreateReq, service: ProjServiceDeps, user: MeDeps)->ProductFullResp:
+    return await service.set_project(data, user)
 
 @router.get(
     "",
@@ -37,8 +39,8 @@ async def get_projects(service: ProjServiceDeps):
     response_model=ProductFullResp | None,
     summary='Get Project by id'
 )
-async def get_project(service: ProjServiceDeps, path: ProjectPath = Depends()):
-    return await service.get_project(path.pid)
+async def get_project(service: ProjServiceDeps, me: MeDeps, path: ProjectPath = Depends()):
+    return await service.get_project(path.pid, me.id)
 
 @router.patch(
     "/{pid}",

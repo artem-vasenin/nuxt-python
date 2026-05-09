@@ -20,6 +20,9 @@ class UserRepo:
             select(UserModel).where(UserModel.email == email)
         )).scalar_one_or_none()
 
+    async def get_item_by_id(self, pid: int) -> type[UserModel] | None:
+        return await self.session.get(UserModel, pid)
+
     async def set_item(self, data: UserRegReq) -> str:
         double_item = await self.get_item(data.email)
         if double_item:

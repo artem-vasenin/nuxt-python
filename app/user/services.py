@@ -15,6 +15,12 @@ class UserService:
             raise HTTPException(status_code=404, detail="Item not found")
         return UserFull(id=res.id, email=res.email, is_active=res.is_active)
 
+    async def get_item_by_id(self, pid: int)->UserFull:
+        res = await self.repo.get_item_by_id(pid)
+        if not res:
+            raise HTTPException(status_code=404, detail="Item not found")
+        return UserFull(id=res.id, email=res.email, is_active=res.is_active)
+
     async def set_item(self, data: UserRegReq)->str:
         res = await self.repo.set_item(data)
         if not res:

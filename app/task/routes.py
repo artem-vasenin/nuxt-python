@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 
+from app.user.me import MeDeps
 from .services import TaskServiceDeps
 from .schemas import TaskFull, TaskCreateReq, TaskUpdateReq, TaskListParams, TaskListResp
 
@@ -18,9 +19,9 @@ async def set_item(data: TaskCreateReq, serv: TaskServiceDeps)->TaskFull:
     return await serv.set_item(data)
 
 @router.patch('/{pid}', status_code=201, response_model=TaskFull)
-async def update_item(pid: int, data: TaskUpdateReq, serv: TaskServiceDeps)->TaskFull:
+async def update_item(pid: int, me: MeDeps, data: TaskUpdateReq, serv: TaskServiceDeps)->TaskFull:
     return await serv.upd_item(pid, data)
 
 @router.delete('/{pid}', status_code=201, response_model=bool)
-async def delete_item(pid: int, serv: TaskServiceDeps)->bool:
+async def delete_item(pid: int, me: MeDeps, serv: TaskServiceDeps)->bool:
     return await serv.del_item(pid)

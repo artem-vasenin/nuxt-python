@@ -22,7 +22,7 @@ def add_token(pid: int) -> str:
 def check_token(token: str) -> int | None:
     try:
         payload = jwt.decode(token, settings.auth.secret, algorithms=['HS256'])
-        return payload['sub']
+        return int(payload['sub'])
     except (jwt.PyJWTError, ValueError, KeyError) as e:
         print(e)
         return None

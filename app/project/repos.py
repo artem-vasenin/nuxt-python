@@ -3,10 +3,11 @@ from typing import Annotated
 from fastapi import Depends, HTTPException
 from sqlalchemy import select
 
-from app.core.db import DbSessionDeps, AsyncSession
+from app.user.me import MeDeps
+from app.user.schemes import UserFull
 from .schemas import  ProjectUpdateReq
-from .models import ProjectModel
-
+from .models import ProjectModel, ProjectUserModel
+from app.core.db import DbSessionDeps, AsyncSession
 
 logger = logging.getLogger(__name__)
 
@@ -18,11 +19,21 @@ class ProjectRepo:
         result = await self.session.execute(select(ProjectModel))
         return result.scalars().all()
 
-    async def get_by_id(self, pid: int) -> type[ProjectModel] | None:
+    async def get_by_id(self, pid: int) -> type[ProjectModel]:
         return await self.session.get(ProjectModel, pid)
 
-    async def set_item(self, item: ProjectModel) -> ProjectModel:
+    async def get_project_permission(self, pid: int, uid: int)->ProjectModel | None:
+        res = await self.session.execute(
+            select(ProjectUserModel)
+            .where(ProjectUserModel.user_id == uid, ProjectUserModel.project_id == pid)
+        )
+        return res.scalar_one_or_none()
+
+    async def set_item(self, item: ProjectModel, user: UserFull) -> ProjectModel:
         self.session.add(item)
+        await self.session.flush()
+        pu_item = ProjectUserModel(user_id=user.id, project_id=item.id, role='owner')
+        self.session.add(pu_item)
         await self.session.commit()
         await self.session.refresh(item)
         logger.info(f'Project {item.key} created')
